@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+# Guardarrail de identidad de Adorema.
+#
+# Adorema debe quedar por fuera de la infraestructura y de las cuentas de
+# M&E Tech Solution. La forma mas silenciosa de romper esa separacion es
+# olvidar configurar la identidad del repositorio: git hereda la identidad
+# global y cada commit del sistema contable de la licorera queda firmado con
+# un correo personal. Una vez en la historia, eso no se quita sin reescribirla.
+#
+# Este hook exige que la identidad este declarada EXPLICITAMENTE en este
+# repositorio y que no sea la misma de la configuracion global. No contiene
+# ningun correo escrito a mano a proposito: no hay lista negra que mantener,
+# ni datos personales dentro de un archivo versionado.
+
+correo_local=$(git config --local --get user.email || true)
+nombre_local=$(git config --local --get user.name || true)
+correo_global=$(git config --global --get user.email || true)
+
+if [ -z "$correo_local" ] || [ -z "$nombre_local" ]; then
+  echo "" >&2
+  echo "  COMMIT BLOQUEADO: este repositorio no tiene identidad propia." >&2
+  echo "" >&2
+  echo "  Sin identidad local, el commit se firmaria con la configuracion" >&2
+  echo "  global de esta maquina y Adorema quedaria ligado a ella." >&2
+  echo "" >&2
+  echo "  Configurala asi (una sola vez):" >&2
+  echo "" >&2
+  echo "    git config user.name  \"Adorema\"" >&2
+  echo "    git config user.email \"correo@dominio-de-adorema\"" >&2
+  echo "" >&2
+  exit 1
+fi
+
+if [ -n "$correo_global" ] && [ "$correo_local" = "$correo_global" ]; then
+  echo "" >&2
+  echo "  COMMIT BLOQUEADO: la identidad local es igual a la global." >&2
+  echo "" >&2
+  echo "  Identidad configurada: $correo_local" >&2
+  echo "" >&2
+  echo "  Adorema debe usar su propio correo, no el de las demas cuentas" >&2
+  echo "  de esta maquina. Ver docs/SEPARACION.md" >&2
+  echo "" >&2
+  exit 1
+fi
+
+exit 0

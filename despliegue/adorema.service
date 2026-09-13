@@ -1,0 +1,59 @@
+# Adorema como servicio del servidor: arranca solo al prender la máquina y
+# vuelve a levantarse si se cae.
+#
+# Copiar a /etc/systemd/system/adorema.service y después:
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now adorema
+#   sudo systemctl status adorema
+#   journalctl -u adorema -f        <- para ver qué está diciendo
+
+[Unit]
+Description=Adorema — sistema de la licorera
+Documentation=file:///opt/adorema/docs/MONTAJE-SERVIDOR.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=adorema
+Group=adorema
+WorkingDirectory=/opt/adorema
+
+# Aquí van la contraseña sellada y la cadena de la base de datos. El archivo es
+# de quien corre el servicio y de nadie más:  sudo chmod 600 /etc/adorema.env
+EnvironmentFile=/etc/adorema.env
+Environment=NODE_ENV=production
+
+ExecStart=/usr/bin/node apps/local/servidor.js
+
+# Si se cae, vuelve; pero si se cae cinco veces en un minuto es que algo está
+# mal de verdad y conviene que se quede quieto para poder leer el registro.
+Restart=on-failure
+RestartSec=3
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+# Al apagar, darle tiempo de cerrar la base y dejar el respaldo.
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+# El programa sólo necesita escribir en su carpeta de datos.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/adorema
+StateDirectory=adorema
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=adorema
+
+[Install]
+WantedBy=multi-user.target

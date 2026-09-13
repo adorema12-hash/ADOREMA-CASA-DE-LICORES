@@ -1,0 +1,38 @@
+# Adorema — la puerta de internet al servidor.
+#
+# Caddy hace dos cosas que no conviene hacer a mano: consigue y renueva solo el
+# certificado de Let's Encrypt, y deja HTTPS bien puesto desde el primer día.
+# Adorema no da la cara a internet: escucha en 127.0.0.1 y Caddy le pasa lo que
+# llega.
+#
+# Copiar a /etc/caddy/Caddyfile y cambiar el dominio por el tuyo.
+# Después:  sudo systemctl reload caddy
+
+adorema.ddns.net {
+	reverse_proxy 127.0.0.1:4300
+
+	# Las facturas y las fotos de evidencia pesan; el programa ya las limita a
+	# 12 MB, así que aquí va un poco más para que el límite lo ponga él y el
+	# aviso sea el suyo.
+	request_body {
+		max_size 15MB
+	}
+
+	encode zstd gzip
+
+	header {
+		# Una vez visto por https, el navegador no vuelve a intentar por http.
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+		# El sistema del negocio no tiene por qué abrirse dentro de otra página.
+		X-Frame-Options "DENY"
+	}
+
+	log {
+		output file /var/log/caddy/adorema.log {
+			roll_size 10MB
+			roll_keep 5
+		}
+	}
+}

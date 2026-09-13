@@ -1,0 +1,973 @@
+<title>Adorema Licorera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  /* ---------------------------------------------------------------------
+     Paleta: tinta y verde botella, sobre papel contable.
+     Las bandas alternas de las tablas son el "greenbar" del papel de
+     contabilidad de toda la vida; aquí no son adorno, sirven para seguir
+     una fila de débitos y créditos sin perder el renglón.
+     --------------------------------------------------------------------- */
+  :root {
+    --papel: #f3f6f3;
+    --superficie: #ffffff;
+    --banda: #eaf1ec;
+    --borde: #d5e0d8;
+    --borde-fuerte: #b6c7bb;
+    --tinta: #15211b;
+    --tinta-media: #41544a;
+    --tinta-tenue: #6d8177;
+    --verde: #0f5132;
+    --verde-claro: #dbeade;
+    --positivo: #1c6b46;
+    --alerta: #8a5a10;
+    --alerta-fondo: #fbf1dd;
+    --critico: #9c2f2f;
+    --critico-fondo: #fbe9e9;
+    --sombra: 0 1px 2px rgba(21, 33, 27, .06), 0 8px 24px -12px rgba(21, 33, 27, .18);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --papel: #0d1310;
+      --superficie: #141c17;
+      --banda: #18211c;
+      --borde: #26332b;
+      --borde-fuerte: #3a4c41;
+      --tinta: #e6ede8;
+      --tinta-media: #a9bcaf;
+      --tinta-tenue: #7e9387;
+      --verde: #6cc196;
+      --verde-claro: #1a2c22;
+      --positivo: #5bbd8c;
+      --alerta: #d6a45c;
+      --alerta-fondo: #2a2213;
+      --critico: #e08585;
+      --critico-fondo: #2c1a1a;
+      --sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -12px rgba(0, 0, 0, .6);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --papel: #0d1310;
+    --superficie: #141c17;
+    --banda: #18211c;
+    --borde: #26332b;
+    --borde-fuerte: #3a4c41;
+    --tinta: #e6ede8;
+    --tinta-media: #a9bcaf;
+    --tinta-tenue: #7e9387;
+    --verde: #6cc196;
+    --verde-claro: #1a2c22;
+    --positivo: #5bbd8c;
+    --alerta: #d6a45c;
+    --alerta-fondo: #2a2213;
+    --critico: #e08585;
+    --critico-fondo: #2c1a1a;
+    --sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -12px rgba(0, 0, 0, .6);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--papel);
+    color: var(--tinta);
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .envoltura { max-width: 1180px; margin: 0 auto; padding: 0 24px 96px; }
+
+  /* ------------------------------------------------------------- cabecera */
+  header.principal {
+    border-bottom: 2px solid var(--borde-fuerte);
+    padding: 40px 0 26px;
+    display: grid;
+    gap: 22px;
+  }
+
+  .marca { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+
+  .marca h1 {
+    font-family: 'Bitter', Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 4.5vw, 2.9rem);
+    letter-spacing: -.02em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .marca .sello {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: .7rem;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--verde);
+    border: 1px solid var(--verde);
+    border-radius: 2px;
+    padding: 3px 8px;
+  }
+
+  .ficha {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 28px;
+    font-size: .85rem;
+    color: var(--tinta-media);
+  }
+  .ficha b { color: var(--tinta); font-weight: 600; }
+
+  .aviso {
+    display: flex;
+    gap: 12px;
+    background: var(--alerta-fondo);
+    border-left: 3px solid var(--alerta);
+    padding: 14px 18px;
+    font-size: .88rem;
+    color: var(--tinta);
+  }
+  .aviso strong { color: var(--alerta); }
+
+  /* ------------------------------------------------------------ navegación */
+  nav.indice {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--papel) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--borde);
+    margin-bottom: 8px;
+  }
+  nav.indice ol {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px;
+    list-style: none;
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  nav.indice a {
+    display: block;
+    padding: 11px 12px;
+    font-size: .78rem;
+    font-weight: 500;
+    letter-spacing: .02em;
+    color: var(--tinta-media);
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+  }
+  nav.indice a:hover { color: var(--verde); border-bottom-color: var(--verde); }
+  nav.indice a:focus-visible { outline: 2px solid var(--verde); outline-offset: -2px; }
+
+  /* -------------------------------------------------------------- secciones */
+  section { padding-top: 52px; scroll-margin-top: 52px; }
+
+  .titulo-seccion { display: flex; align-items: baseline; gap: 14px; margin-bottom: 6px; flex-wrap: wrap; }
+  .titulo-seccion h2 {
+    font-family: 'Bitter', Georgia, serif;
+    font-size: 1.42rem;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -.01em;
+  }
+  .titulo-seccion .contador {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .74rem;
+    color: var(--tinta-tenue);
+  }
+  .entradilla {
+    color: var(--tinta-media);
+    font-size: .92rem;
+    max-width: 62ch;
+    margin: 0 0 20px;
+  }
+
+  /* --------------------------------------------------------------- tarjetas */
+  .rejilla { display: grid; gap: 14px; }
+  .rejilla.k3 { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .rejilla.k2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+
+  .panel {
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    box-shadow: var(--sombra);
+  }
+  .panel > h3 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .74rem;
+    font-weight: 600;
+    letter-spacing: .085em;
+    text-transform: uppercase;
+    color: var(--tinta-tenue);
+    margin: 0;
+    padding: 13px 16px 11px;
+    border-bottom: 1px solid var(--borde);
+  }
+  .panel .cuerpo { padding: 16px; }
+
+  /* Cifras destacadas: sólo donde el número ES el mensaje. */
+  .cifra { padding: 16px; display: grid; gap: 3px; }
+  .cifra .rotulo {
+    font-size: .72rem;
+    letter-spacing: .075em;
+    text-transform: uppercase;
+    color: var(--tinta-tenue);
+    font-weight: 600;
+  }
+  .cifra .valor {
+    font-family: 'Bitter', Georgia, serif;
+    font-size: 1.7rem;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.15;
+  }
+  .cifra .pie { font-size: .78rem; color: var(--tinta-media); }
+  .cifra .valor.bueno { color: var(--positivo); }
+  .cifra .valor.malo { color: var(--critico); }
+
+  /* ---------------------------------------------------------------- tablas */
+  .marco-tabla { overflow-x: auto; border: 1px solid var(--borde); background: var(--superficie); box-shadow: var(--sombra); }
+  .marco-tabla.alto { max-height: 460px; overflow-y: auto; }
+
+  table { border-collapse: collapse; width: 100%; font-size: .855rem; }
+  thead th {
+    position: sticky;
+    top: 0;
+    background: var(--superficie);
+    text-align: left;
+    font-size: .68rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--tinta-tenue);
+    padding: 10px 12px;
+    border-bottom: 1.5px solid var(--borde-fuerte);
+    white-space: nowrap;
+  }
+  tbody td { padding: 8px 12px; border-bottom: 1px solid var(--borde); vertical-align: top; }
+  /* Bandas de papel contable */
+  tbody tr:nth-child(even) { background: var(--banda); }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+  .cod { font-family: 'IBM Plex Mono', monospace; font-size: .8rem; color: var(--tinta-media); white-space: nowrap; }
+  .tenue { color: var(--tinta-tenue); }
+  tfoot td { padding: 10px 12px; border-top: 1.5px solid var(--borde-fuerte); font-weight: 600; }
+
+  /* --------------------------------------------------------------- señales */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .chip.ok { background: var(--verde-claro); color: var(--positivo); }
+  .chip.aviso { background: var(--alerta-fondo); color: var(--alerta); }
+  .chip.mal { background: var(--critico-fondo); color: var(--critico); }
+  .chip.neutro { background: var(--banda); color: var(--tinta-media); }
+
+  /* Franja de severidad al borde de la fila */
+  td.franja { border-left: 3px solid transparent; }
+  tr.atencion td.franja { border-left-color: var(--alerta); }
+  tr.critica td.franja { border-left-color: var(--critico); }
+
+  /* ------------------------------------------------------ verificación */
+  .verificacion { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .prueba {
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-top: 3px solid var(--positivo);
+    padding: 15px 16px;
+    display: grid;
+    gap: 6px;
+  }
+  .prueba.falla { border-top-color: var(--critico); }
+  .prueba .que { font-weight: 600; font-size: .9rem; }
+  .prueba .como { font-size: .8rem; color: var(--tinta-media); }
+  .prueba .cifras { font-family: 'IBM Plex Mono', monospace; font-size: .78rem; color: var(--tinta-media); }
+
+  /* ------------------------------------------------------------- asientos */
+  .libro { display: grid; gap: 10px; }
+  .asiento {
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-left: 3px solid var(--verde);
+  }
+  .asiento .encabezado {
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    flex-wrap: wrap;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--borde);
+  }
+  .asiento .consecutivo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    color: var(--verde);
+    font-size: .82rem;
+  }
+  .asiento .glosa { font-weight: 500; font-size: .9rem; }
+  .asiento table { font-size: .82rem; }
+  .asiento tbody tr:nth-child(even) { background: transparent; }
+  .asiento tbody td { border-bottom: none; padding: 4px 14px; }
+  .asiento tbody tr:first-child td { padding-top: 9px; }
+  .asiento tbody tr:last-child td { padding-bottom: 9px; }
+
+  /* --------------------------------------------------------------- gráfico */
+  .grafico { padding: 8px 4px 0; }
+  .grafico svg { display: block; width: 100%; height: auto; }
+  .leyenda { display: flex; gap: 18px; flex-wrap: wrap; font-size: .78rem; color: var(--tinta-media); padding: 10px 16px 2px; }
+  .leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+  .muestra { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+
+  /* --------------------------------------------------------- barras en fila */
+  .barra-fondo { background: var(--banda); height: 6px; border-radius: 3px; overflow: hidden; min-width: 70px; }
+  .barra-valor { background: var(--verde); height: 100%; display: block; }
+
+  footer.pie {
+    margin-top: 64px;
+    padding-top: 22px;
+    border-top: 2px solid var(--borde-fuerte);
+    font-size: .82rem;
+    color: var(--tinta-tenue);
+    display: grid;
+    gap: 6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  @media (max-width: 620px) {
+    .envoltura { padding: 0 16px 64px; }
+    nav.indice ol { padding: 0 16px; }
+    .cifra .valor { font-size: 1.45rem; }
+  }
+</style>
+
+<nav class="indice">
+  <ol>
+    <li><a href="#verificacion">Verificación</a></li>
+    <li><a href="#resumen">Resumen</a></li>
+    <li><a href="#ventas">Ventas</a></li>
+    <li><a href="#inventario">Inventario</a></li>
+    <li><a href="#kardex">Kardex</a></li>
+    <li><a href="#trazabilidad">Trazabilidad</a></li>
+    <li><a href="#compras">Compras</a></li>
+    <li><a href="#caja">Caja</a></li>
+    <li><a href="#cartera">Cartera</a></li>
+    <li><a href="#flujo">Flujo de caja</a></li>
+    <li><a href="#resultados">Resultados</a></li>
+    <li><a href="#balance">Balance</a></li>
+    <li><a href="#libro">Libro</a></li>
+    <li><a href="#catalogo">Catálogo</a></li>
+    <li><a href="#impuestos">Impuestos</a></li>
+  </ol>
+</nav>
+
+<div class="envoltura">
+  <header class="principal">
+    <div class="marca">
+      <h1 id="razon-social">Adorema</h1>
+      <span class="sello">Datos de ejemplo</span>
+    </div>
+    <div class="ficha" id="ficha"></div>
+    <div class="aviso">
+      <div>
+        <strong>Nada de esto es real todavía.</strong>
+        Las cifras salen de un mes simulado de operación, generado ejecutando los
+        casos de uso reales del sistema: cada venta pasó por el motor de costeo,
+        cada compra por el prorrateo, cada merma por su asiento. Las tarifas de
+        impuesto son <b>provisionales</b> y deben confirmarse con el contador
+        antes de operar.
+      </div>
+    </div>
+  </header>
+
+  <main id="contenido"></main>
+
+  <footer class="pie">
+    <div id="pie-generado"></div>
+    <div>Licorera Adorema · Medellín, Antioquia · Sistema contable, de inventario, trazabilidad y flujo de caja.</div>
+  </footer>
+</div>
+
+<script>
+  const DATOS = "__DATOS__";
+
+  // --------------------------------------------------------------- formato
+  const fmtCOP = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+  const fmtNum = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 });
+  const fmtEntero = new Intl.NumberFormat('es-CO');
+
+  /** Los importes viajan como centavos en texto para no perder precisión. */
+  const pesos = (centavos) => fmtCOP.format(Number(centavos ?? 0) / 100);
+  const pesosCortos = (centavos) => {
+    const v = Number(centavos ?? 0) / 100;
+    if (Math.abs(v) >= 1e6) return '$' + fmtNum.format(v / 1e6) + ' M';
+    if (Math.abs(v) >= 1e3) return '$' + fmtEntero.format(Math.round(v / 1e3)) + ' k';
+    return fmtCOP.format(v);
+  };
+  /** Las cantidades viajan como milésimas de unidad base. */
+  const cant = (milesimas, unidad) => {
+    const v = Number(milesimas ?? 0) / 1000;
+    const sufijo = unidad === 'ML' ? ' ml' : unidad === 'GRAMO' ? ' g' : '';
+    return fmtNum.format(v) + sufijo;
+  };
+  const fecha = (f) => {
+    const d = new Date(String(f) + 'T12:00:00Z');
+    return d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', timeZone: 'UTC' });
+  };
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  const el = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content; };
+
+  // ------------------------------------------------------------- cabecera
+  document.getElementById('razon-social').textContent = DATOS.empresa?.razon_social ?? 'Adorema';
+  document.getElementById('ficha').innerHTML = [
+    ['NIT', esc(DATOS.empresa?.nit) + '-' + esc(DATOS.empresa?.digito_verificacion)],
+    ['Domicilio', esc(DATOS.empresa?.municipio) + ', ' + esc(DATOS.empresa?.departamento)],
+    ['Período', fecha(DATOS.periodo.desde) + ' – ' + fecha(DATOS.periodo.hasta) + ' de 2026'],
+    ['Régimen', DATOS.empresa?.responsable_iva ? 'Responsable de IVA' : 'No responsable de IVA'],
+    ['Consumo de licores', DATOS.empresa?.responsable_consumo ? 'Responsable' : 'Minorista — el impuesto es costo'],
+  ].map(([k, v]) => `<span>${k}: <b>${v}</b></span>`).join('');
+
+  document.getElementById('pie-generado').textContent =
+    'Generado el ' + new Date(DATOS.generado).toLocaleString('es-CO') +
+    ' · ' + fmtEntero.format(Number(DATOS.conteos.asientos)) + ' asientos, ' +
+    fmtEntero.format(Number(DATOS.conteos.lineas)) + ' líneas contables, ' +
+    fmtEntero.format(Number(DATOS.conteos.movimientos)) + ' movimientos de inventario.';
+
+  const main = document.getElementById('contenido');
+  const seccion = (id, titulo, contador, entradilla, cuerpo) => {
+    main.appendChild(el(`
+      <section id="${id}">
+        <div class="titulo-seccion">
+          <h2>${titulo}</h2>
+          ${contador ? `<span class="contador">${contador}</span>` : ''}
+        </div>
+        ${entradilla ? `<p class="entradilla">${entradilla}</p>` : ''}
+        <div class="contenedor"></div>
+      </section>
+    `));
+    main.lastElementChild.querySelector('.contenedor').appendChild(
+      typeof cuerpo === 'string' ? el(cuerpo) : cuerpo,
+    );
+  };
+
+  // ==================================================== 1. VERIFICACIÓN
+  {
+    const i = DATOS.integridad;
+    const g = DATOS.general;
+    const prueba = (ok, que, como, cifras) => `
+      <div class="prueba ${ok ? '' : 'falla'}">
+        <span class="chip ${ok ? 'ok' : 'mal'}">${ok ? '✓ Cuadra' : '✗ No cuadra'}</span>
+        <div class="que">${que}</div>
+        <div class="como">${como}</div>
+        <div class="cifras">${cifras}</div>
+      </div>`;
+
+    seccion('verificacion', 'Verificación de integridad', null,
+      'Antes de mostrar una sola cifra, el sistema se verifica a sí mismo. Son tres caminos independientes hacia el mismo número: si no coinciden al centavo, los informes no valen nada y es mejor saberlo aquí.',
+      `<div class="verificacion">
+        ${prueba(i.libroCuadra, 'El libro cuadra',
+          'La suma de todos los débitos es igual a la de todos los créditos, en el libro completo.',
+          'diferencia: ' + pesos(i.diferenciaLibro))}
+        ${prueba(i.inventarioConcuerda, 'Inventario: tres fuentes, un número',
+          'El saldo contable de las cuentas de inventario, la suma del kardex y la tabla de saldos coinciden.',
+          'balance ' + pesos(i.inventarioEnBalance) + ' · kardex ' + pesos(i.inventarioEnKardex) + ' · saldos ' + pesos(i.inventarioEnSaldos))}
+        ${prueba(g.cuadra, 'Balance general cuadra',
+          'Activo igual a pasivo más patrimonio más el resultado del ejercicio, que aún no se ha cerrado.',
+          'activo ' + pesos(g.activo) + ' = pasivo ' + pesos(g.pasivo) + ' + patrimonio ' + pesos(g.patrimonio) + ' + resultado ' + pesos(g.resultadoDelEjercicio))}
+      </div>`);
+  }
+
+  // ========================================================= 2. RESUMEN
+  {
+    const r = DATOS.resultados;
+    const inventario = DATOS.stock.reduce((a, e) => a + Number(e.costoTotal), 0);
+    const carteraTotal = DATOS.fiados.reduce((a, c) => a + Number(c.saldo), 0);
+    const margen = Number(r.ingresos) === 0 ? 0 : (Number(r.utilidadBruta) / Number(r.ingresos)) * 100;
+    const ticket = Number(DATOS.conteos.ventas) === 0 ? 0 : Number(r.ingresos) / Number(DATOS.conteos.ventas);
+
+    const tarjeta = (rotulo, valor, pie, clase = '') => `
+      <div class="panel"><div class="cifra">
+        <span class="rotulo">${rotulo}</span>
+        <span class="valor ${clase}">${valor}</span>
+        <span class="pie">${pie}</span>
+      </div></div>`;
+
+    seccion('resumen', 'El mes en cifras', DATOS.conteos.ventas + ' transacciones',
+      'Lo que un dueño de licorera quiere saber al abrir el sistema por la mañana.',
+      `<div class="rejilla k3">
+        ${tarjeta('Ingresos del período', pesos(r.ingresos), 'base gravable, sin impuestos')}
+        ${tarjeta('Utilidad bruta', pesos(r.utilidadBruta), fmtNum.format(margen) + '% de margen', 'bueno')}
+        ${tarjeta('Utilidad operacional', pesos(r.utilidadOperacional), 'después de ' + pesos(r.gastos) + ' en gastos',
+          Number(r.utilidadOperacional) >= 0 ? 'bueno' : 'malo')}
+        ${tarjeta('Inventario valorizado', pesos(inventario), 'al promedio ponderado móvil')}
+        ${tarjeta('Cartera por cobrar', pesos(carteraTotal), DATOS.fiados.length + ' clientes con fiado pendiente')}
+        ${tarjeta('Ticket promedio', pesos(ticket), 'por transacción de mostrador')}
+      </div>`);
+  }
+
+  // ========================================================== 3. VENTAS
+  {
+    const dias = DATOS.ventasPorDia;
+    const maximo = Math.max(...dias.map((d) => Number(d.total)));
+    const W = 900, H = 220, izq = 58, der = 12, arriba = 14, abajo = 30;
+    const ancho = (W - izq - der) / dias.length;
+
+    const escalaY = (v) => arriba + (H - arriba - abajo) * (1 - v / maximo);
+    const marcas = [0, 0.25, 0.5, 0.75, 1].map((p) => p * maximo);
+
+    const barras = dias.map((d, i) => {
+      const x = izq + i * ancho;
+      const yTotal = escalaY(Number(d.total));
+      const yCosto = escalaY(Number(d.costo));
+      const base = H - abajo;
+      return `
+        <rect x="${x + 1}" y="${yTotal}" width="${ancho - 2}" height="${base - yTotal}" fill="var(--verde)" opacity=".28"></rect>
+        <rect x="${x + 1}" y="${yCosto}" width="${ancho - 2}" height="${base - yCosto}" fill="var(--verde)" opacity=".85"></rect>`;
+    }).join('');
+
+    const etiquetasX = dias.map((d, i) => {
+      if (i % 4 !== 0) return '';
+      return `<text x="${izq + i * ancho + ancho / 2}" y="${H - 10}" text-anchor="middle"
+                font-size="10" fill="var(--tinta-tenue)" font-family="IBM Plex Mono, monospace">${fecha(d.fecha)}</text>`;
+    }).join('');
+
+    const ejeY = marcas.map((v) => `
+      <line x1="${izq}" y1="${escalaY(v)}" x2="${W - der}" y2="${escalaY(v)}" stroke="var(--borde)" stroke-width="1"></line>
+      <text x="${izq - 8}" y="${escalaY(v) + 3.5}" text-anchor="end" font-size="10"
+            fill="var(--tinta-tenue)" font-family="IBM Plex Mono, monospace">${pesosCortos(v)}</text>`).join('');
+
+    const medios = DATOS.porMedioPago;
+    const totalMedios = medios.reduce((a, m) => a + Number(m.total), 0);
+    const filasMedios = medios.map((m) => `
+      <tr>
+        <td>${esc(m.medio === 'CREDITO' ? 'Fiado' : m.medio.charAt(0) + m.medio.slice(1).toLowerCase())}</td>
+        <td class="num">${fmtEntero.format(Number(m.operaciones))}</td>
+        <td class="num">${pesos(m.total)}</td>
+        <td style="width:110px"><span class="barra-fondo"><span class="barra-valor" style="width:${(Number(m.total) / totalMedios * 100).toFixed(1)}%"></span></span></td>
+      </tr>`).join('');
+
+    const filasCategoria = DATOS.porCategoria.map((c) => {
+      const ing = Number(c.ingreso), cos = Number(c.costo);
+      const m = ing === 0 ? 0 : ((ing - cos) / ing) * 100;
+      return `<tr>
+        <td>${esc(c.categoria)}</td>
+        <td class="num">${pesos(c.ingreso)}</td>
+        <td class="num">${pesos(ing - cos)}</td>
+        <td class="num">${fmtNum.format(m)}%</td>
+      </tr>`;
+    }).join('');
+
+    const filasRanking = DATOS.ranking.slice(0, 10).map((p) => `
+      <tr>
+        <td>${esc(p.nombre)}</td>
+        <td class="tenue">${esc(p.categoria)}</td>
+        <td class="num">${cant(p.unidades)}</td>
+        <td class="num">${pesos(p.ingreso)}</td>
+        <td class="num">${pesos(p.margen)}</td>
+        <td class="num">${fmtNum.format(p.margenPorcentual)}%</td>
+      </tr>`).join('');
+
+    seccion('ventas', 'Ventas del mostrador', DATOS.conteos.ventas + ' ventas',
+      'El área clara es el ingreso; la oscura, el costo de la mercancía que salió. La franja entre las dos es el margen, y se reconoce en el mismo acto de la venta, no a fin de mes.',
+      `<div class="panel" style="margin-bottom:14px">
+        <h3>Ingreso y costo, día a día</h3>
+        <div class="leyenda">
+          <span><i class="muestra" style="background:var(--verde);opacity:.28"></i> Ingreso con impuestos</span>
+          <span><i class="muestra" style="background:var(--verde);opacity:.85"></i> Costo de la mercancía</span>
+        </div>
+        <div class="grafico">
+          <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Ingreso y costo diario del período">
+            ${ejeY}${barras}${etiquetasX}
+          </svg>
+        </div>
+      </div>
+      <div class="rejilla k2">
+        <div class="panel">
+          <h3>Cómo paga la gente</h3>
+          <div class="marco-tabla" style="border:none;box-shadow:none">
+            <table><thead><tr><th>Medio</th><th class="num">Ops.</th><th class="num">Total</th><th></th></tr></thead>
+            <tbody>${filasMedios}</tbody></table>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Margen por categoría</h3>
+          <div class="marco-tabla" style="border:none;box-shadow:none">
+            <table><thead><tr><th>Categoría</th><th class="num">Ingreso</th><th class="num">Margen</th><th class="num">%</th></tr></thead>
+            <tbody>${filasCategoria}</tbody></table>
+          </div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <h3>Los diez que más venden</h3>
+        <div class="marco-tabla" style="border:none;box-shadow:none">
+          <table><thead><tr><th>Producto</th><th>Categoría</th><th class="num">Unidades</th><th class="num">Ingreso</th><th class="num">Margen</th><th class="num">%</th></tr></thead>
+          <tbody>${filasRanking}</tbody></table>
+        </div>
+      </div>`);
+  }
+
+  // ====================================================== 4. INVENTARIO
+  {
+    const filas = DATOS.stock.map((e) => {
+      const bajo = e.bajoMinimo;
+      const sinStock = Number(e.cantidad) === 0;
+      return `<tr class="${sinStock ? 'critica' : bajo ? 'atencion' : ''}">
+        <td class="franja"><span class="cod">${esc(e.sku)}</span></td>
+        <td>${esc(e.nombre)}</td>
+        <td class="tenue">${esc(e.categoria)}</td>
+        <td class="num">${cant(e.cantidad, e.unidadBase)}</td>
+        <td class="num">${pesos(e.costoTotal)}</td>
+        <td class="num">${pesos(e.costoUnitario)}</td>
+        <td class="num">${e.precioVenta === null ? '—' : pesos(e.precioVenta)}</td>
+        <td class="num">${e.margen === null ? '—' : pesos(e.margen)}</td>
+        <td>${sinStock ? '<span class="chip mal">Agotado</span>' : bajo ? '<span class="chip aviso">Bajo mínimo</span>' : '<span class="chip ok">En nivel</span>'}</td>
+      </tr>`;
+    }).join('');
+
+    const total = DATOS.stock.reduce((a, e) => a + Number(e.costoTotal), 0);
+
+    seccion('inventario', 'Existencias valorizadas', DATOS.stock.length + ' productos',
+      'El costo unitario no se guarda: se deriva de cantidad y costo total exactos. Guardar el promedio redondeado hace que el inventario se desvíe centavo a centavo hasta que un día el balance no cuadra.',
+      `<div class="marco-tabla alto">
+        <table>
+          <thead><tr>
+            <th>SKU</th><th>Producto</th><th>Categoría</th>
+            <th class="num">Existencia</th><th class="num">Valor</th><th class="num">Costo unit.</th>
+            <th class="num">Precio</th><th class="num">Margen</th><th>Estado</th>
+          </tr></thead>
+          <tbody>${filas}</tbody>
+          <tfoot><tr><td colspan="4">Inventario total al ${fecha(DATOS.periodo.hasta)}</td><td class="num">${pesos(total)}</td><td colspan="4"></td></tr></tfoot>
+        </table>
+      </div>`);
+  }
+
+  // =========================================================== 5. KARDEX
+  {
+    const bloques = Object.entries(DATOS.kardexes).map(([sku, k]) => {
+      const filas = k.movimientos.slice(-14).map((m) => `
+        <tr>
+          <td class="cod">${fecha(m.fecha)}</td>
+          <td class="cod">#${m.consecutivoAsiento}</td>
+          <td>${esc(m.tipo.replace(/_/g, ' ').toLowerCase())}</td>
+          <td class="tenue">${esc(m.lote ?? '—')}</td>
+          <td class="num" style="color:${Number(m.cantidad) < 0 ? 'var(--critico)' : 'var(--positivo)'}">${cant(m.cantidad, k.unidadBase)}</td>
+          <td class="num">${pesos(m.costoTotal)}</td>
+          <td class="num">${cant(m.saldoCantidad, k.unidadBase)}</td>
+          <td class="num">${pesos(m.saldoCosto)}</td>
+        </tr>`).join('');
+
+      return `<div class="panel" style="margin-bottom:14px">
+        <h3>${esc(k.producto)} <span style="text-transform:none;letter-spacing:0;color:var(--tinta-tenue)">· ${esc(sku)} · unidad base: ${k.unidadBase === 'ML' ? 'mililitro' : 'unidad'} · últimos 14 de ${k.movimientos.length} movimientos</span></h3>
+        <div class="marco-tabla" style="border:none;box-shadow:none">
+          <table>
+            <thead><tr><th>Fecha</th><th>Asiento</th><th>Tipo</th><th>Lote</th><th class="num">Cantidad</th><th class="num">Costo</th><th class="num">Saldo</th><th class="num">Valor</th></tr></thead>
+            <tbody>${filas}</tbody>
+          </table>
+        </div>
+      </div>`;
+    }).join('');
+
+    seccion('kardex', 'Kardex', 'saldo corrido',
+      'Cada movimiento apunta al asiento que lo respalda. El aguardiente se mide en mililitros: por eso la misma existencia sirve para vender la caja, la botella y el trago de 45 ml sin que los saldos se desincronicen.',
+      bloques);
+  }
+
+  // ===================================================== 6. TRAZABILIDAD
+  {
+    const filas = DATOS.trazabilidad.slice(0, 24).map((l) => `
+      <tr>
+        <td class="cod">${esc(l.lote)}</td>
+        <td>${esc(l.producto)}</td>
+        <td class="tenue">${esc(l.proveedor ?? '—')}</td>
+        <td class="cod">${esc(l.factura_proveedor ?? '—')}</td>
+        <td class="cod">${esc(l.senalizacion ?? '—')}</td>
+        <td class="cod">${l.fecha_vencimiento ? fecha(l.fecha_vencimiento) : '—'}</td>
+        <td class="num">${cant(l.saldo)}</td>
+        <td class="num">${fmtEntero.format(Number(l.movimientos))}</td>
+      </tr>`).join('');
+
+    seccion('trazabilidad', 'Trazabilidad por lote', DATOS.trazabilidad.length + ' lotes',
+      'Hacia atrás: proveedor, factura y señalización departamental. Hacia adelante: qué venta consumió qué lote. La valoración va por promedio ponderado y la trazabilidad por lote — son dos preguntas distintas y se resuelven por separado.',
+      `<div class="marco-tabla alto">
+        <table>
+          <thead><tr><th>Lote</th><th>Producto</th><th>Proveedor</th><th>Factura</th><th>Señalización</th><th>Vence</th><th class="num">Saldo</th><th class="num">Movs.</th></tr></thead>
+          <tbody>${filas}</tbody>
+        </table>
+      </div>`);
+  }
+
+  // ========================================================== 7. COMPRAS
+  {
+    const filas = DATOS.compras.map((c) => `
+      <tr>
+        <td class="cod">${esc(c.numero_factura)}</td>
+        <td class="cod">${fecha(c.fecha)}</td>
+        <td>${esc(c.proveedor)}</td>
+        <td class="num">${fmtEntero.format(Number(c.lineas))}</td>
+        <td class="num">${pesos(c.subtotal)}</td>
+        <td class="num">${Number(c.flete) === 0 ? '—' : pesos(c.flete)}</td>
+        <td class="num">${pesos(c.iva_descontable)}</td>
+        <td class="num">${pesos(c.total)}</td>
+        <td class="cod">${c.fecha_vencimiento ? fecha(c.fecha_vencimiento) : '—'}</td>
+      </tr>`).join('');
+
+    const totalPorPagar = DATOS.balance.find((b) => b.codigo === '220505');
+
+    seccion('compras', 'Compras a proveedor', DATOS.compras.length + ' facturas',
+      'El flete se prorratea entre las líneas por valor, con un reparto que garantiza que las partes sumen exactamente el total. El IVA descontable nunca entra al costo del inventario; el impuesto al consumo, para un minorista, sí.',
+      `<div class="marco-tabla">
+        <table>
+          <thead><tr><th>Factura</th><th>Fecha</th><th>Proveedor</th><th class="num">Líneas</th><th class="num">Subtotal</th><th class="num">Flete</th><th class="num">IVA desc.</th><th class="num">Total</th><th>Vence</th></tr></thead>
+          <tbody>${filas}</tbody>
+          ${totalPorPagar ? `<tfoot><tr><td colspan="7">Saldo pendiente con proveedores</td><td class="num">${pesos(totalPorPagar.saldo)}</td><td></td></tr></tfoot>` : ''}
+        </table>
+      </div>`);
+  }
+
+  // ============================================================= 8. CAJA
+  {
+    const conDiferencia = DATOS.turnos.filter((t) => Number(t.diferencia) !== 0);
+    const filas = DATOS.turnos.map((t) => {
+      const d = Number(t.diferencia);
+      return `<tr class="${d < 0 ? 'critica' : d > 0 ? 'atencion' : ''}">
+        <td class="franja cod">${fecha(t.fecha)}</td>
+        <td class="num">${fmtEntero.format(Number(t.ventas))}</td>
+        <td class="num">${pesos(t.base_inicial)}</td>
+        <td class="num">${pesos(t.efectivo_contado)}</td>
+        <td class="num">${d === 0 ? '—' : pesos(t.diferencia)}</td>
+        <td>${d === 0 ? '<span class="chip ok">Cuadra</span>' : d < 0 ? '<span class="chip mal">Faltante</span>' : '<span class="chip aviso">Sobrante</span>'}</td>
+      </tr>`;
+    }).join('');
+
+    const totalDif = conDiferencia.reduce((a, t) => a + Number(t.diferencia), 0);
+
+    seccion('caja', 'Arqueo de caja por turno', DATOS.turnos.length + ' turnos',
+      'El arqueo no existe para que la caja cuadre: existe para que toda diferencia quede con fecha y responsable. Los faltantes van contra una cuenta de gasto — el sistema no permite "ajustar" el efectivo en silencio.',
+      `<div class="rejilla k3" style="margin-bottom:14px">
+        <div class="panel"><div class="cifra">
+          <span class="rotulo">Turnos que cuadraron</span>
+          <span class="valor bueno">${DATOS.turnos.length - conDiferencia.length} de ${DATOS.turnos.length}</span>
+          <span class="pie">sin diferencia en el arqueo</span>
+        </div></div>
+        <div class="panel"><div class="cifra">
+          <span class="rotulo">Diferencia acumulada</span>
+          <span class="valor ${totalDif < 0 ? 'malo' : ''}">${pesos(totalDif)}</span>
+          <span class="pie">${conDiferencia.length} turnos con novedad</span>
+        </div></div>
+      </div>
+      <div class="marco-tabla alto">
+        <table>
+          <thead><tr><th>Fecha</th><th class="num">Ventas</th><th class="num">Base</th><th class="num">Contado</th><th class="num">Diferencia</th><th>Estado</th></tr></thead>
+          <tbody>${filas}</tbody>
+        </table>
+      </div>`);
+  }
+
+  // ========================================================== 9. CARTERA
+  {
+    const filas = DATOS.fiados.map((c) => `
+      <tr class="${c.sobrecupo ? 'critica' : Number(c.disponible) < Number(c.cupo) * 0.2 ? 'atencion' : ''}">
+        <td class="franja">${esc(c.nombre)}</td>
+        <td class="cod">${esc(c.documento)}</td>
+        <td class="num">${pesos(c.cupo)}</td>
+        <td class="num">${pesos(c.saldo)}</td>
+        <td class="num">${pesos(c.disponible)}</td>
+        <td>${c.sobrecupo ? '<span class="chip mal">Sobre cupo</span>' : '<span class="chip ok">Dentro del cupo</span>'}</td>
+      </tr>`).join('');
+
+    seccion('cartera', 'Cartera de fiados', DATOS.fiados.length + ' clientes',
+      'En una licorera el fiado no es una función avanzada: es operación diaria. El saldo no se guarda en ningún contador aparte — se calcula sumando los movimientos de la cuenta de clientes en el libro.',
+      `<div class="marco-tabla">
+        <table>
+          <thead><tr><th>Cliente</th><th>Documento</th><th class="num">Cupo</th><th class="num">Debe</th><th class="num">Disponible</th><th>Estado</th></tr></thead>
+          <tbody>${filas}</tbody>
+        </table>
+      </div>`);
+  }
+
+  // ============================================================ 10. FLUJO
+  {
+    const f = DATOS.flujo;
+    const filas = f.movimientos.slice(-22).map((m) => `
+      <tr>
+        <td class="cod">${fecha(m.fecha)}</td>
+        <td>${esc(m.descripcion)}</td>
+        <td class="tenue">${esc(m.cuenta)}</td>
+        <td class="num" style="color:var(--positivo)">${Number(m.entrada) === 0 ? '' : pesos(m.entrada)}</td>
+        <td class="num" style="color:var(--critico)">${Number(m.salida) === 0 ? '' : pesos(m.salida)}</td>
+      </tr>`).join('');
+
+    seccion('flujo', 'Flujo de caja', f.movimientos.length + ' movimientos',
+      'Distinto del estado de resultados a propósito. «¿Gané plata este mes?» y «¿tengo con qué pagarle al proveedor el viernes?» son dos preguntas distintas: un negocio puede ser rentable y quedarse sin efectivo.',
+      `<div class="rejilla k3" style="margin-bottom:14px">
+        <div class="panel"><div class="cifra"><span class="rotulo">Entradas de efectivo</span><span class="valor bueno">${pesos(f.entradas)}</span><span class="pie">caja y bancos</span></div></div>
+        <div class="panel"><div class="cifra"><span class="rotulo">Salidas de efectivo</span><span class="valor malo">${pesos(f.salidas)}</span><span class="pie">pagos y gastos</span></div></div>
+        <div class="panel"><div class="cifra"><span class="rotulo">Flujo neto</span><span class="valor ${Number(f.neto) >= 0 ? 'bueno' : 'malo'}">${pesos(f.neto)}</span><span class="pie">del período</span></div></div>
+      </div>
+      <div class="marco-tabla alto">
+        <table>
+          <thead><tr><th>Fecha</th><th>Concepto</th><th>Cuenta</th><th class="num">Entra</th><th class="num">Sale</th></tr></thead>
+          <tbody>${filas}</tbody>
+        </table>
+      </div>`);
+  }
+
+  // ======================================================= 11. RESULTADOS
+  {
+    const r = DATOS.resultados;
+    const grupo = (clase) => r.detalle.filter((d) => d.clase === clase);
+    const lineas = (items) => items.map((d) => `
+      <tr><td class="cod">${esc(d.codigo)}</td><td>${esc(d.nombre)}</td><td class="num">${pesos(d.saldo)}</td></tr>`).join('');
+
+    seccion('resultados', 'Estado de resultados', fecha(DATOS.periodo.desde) + ' – ' + fecha(DATOS.periodo.hasta),
+      'Por causación. El costo de ventas sale del promedio ponderado del momento de cada venta, no de un estimado de cierre.',
+      `<div class="marco-tabla">
+        <table>
+          <thead><tr><th>Código</th><th>Cuenta</th><th class="num">Valor</th></tr></thead>
+          <tbody>
+            ${lineas(grupo('INGRESO'))}
+            <tr style="background:var(--verde-claro)"><td></td><td><b>Total ingresos</b></td><td class="num"><b>${pesos(r.ingresos)}</b></td></tr>
+            ${lineas(grupo('COSTO_VENTAS'))}
+            <tr style="background:var(--verde-claro)"><td></td><td><b>Utilidad bruta</b></td><td class="num"><b>${pesos(r.utilidadBruta)}</b></td></tr>
+            ${lineas(grupo('GASTO'))}
+          </tbody>
+          <tfoot><tr><td></td><td>Utilidad operacional</td><td class="num">${pesos(r.utilidadOperacional)}</td></tr></tfoot>
+        </table>
+      </div>`);
+  }
+
+  // ========================================================== 12. BALANCE
+  {
+    const b = DATOS.balance;
+    const filas = b.map((c) => `
+      <tr>
+        <td class="cod">${esc(c.codigo)}</td>
+        <td>${esc(c.nombre)}</td>
+        <td class="tenue" style="font-size:.78rem">${esc(c.clase.replace('_', ' ').toLowerCase())}</td>
+        <td class="num">${pesos(c.debitos)}</td>
+        <td class="num">${pesos(c.creditos)}</td>
+        <td class="num">${pesos(c.saldo)}</td>
+      </tr>`).join('');
+
+    const td = b.reduce((a, c) => a + Number(c.debitos), 0);
+    const tc = b.reduce((a, c) => a + Number(c.creditos), 0);
+
+    seccion('balance', 'Balance de prueba', b.length + ' cuentas con movimiento',
+      'El plan de cuentas es el PUC colombiano y vive en la base de datos como dato, no en el código: el contador puede renombrar y agregar subcuentas sin que nadie toque la lógica.',
+      `<div class="marco-tabla alto">
+        <table>
+          <thead><tr><th>Código</th><th>Cuenta</th><th>Clase</th><th class="num">Débitos</th><th class="num">Créditos</th><th class="num">Saldo</th></tr></thead>
+          <tbody>${filas}</tbody>
+          <tfoot><tr><td colspan="3">Sumas iguales</td><td class="num">${pesos(td)}</td><td class="num">${pesos(tc)}</td><td class="num">${td === tc ? '✓' : '✗'}</td></tr></tfoot>
+        </table>
+      </div>`);
+  }
+
+  // ============================================================ 13. LIBRO
+  {
+    const bloques = DATOS.asientos.slice(0, 10).map((a) => {
+      const filas = a.lineas.map((l) => `
+        <tr>
+          <td class="cod" style="width:74px">${esc(l.cuenta)}</td>
+          <td>${esc(l.nombre)}</td>
+          <td class="num" style="width:130px">${Number(l.debito) === 0 ? '' : pesos(l.debito)}</td>
+          <td class="num" style="width:130px">${Number(l.credito) === 0 ? '' : pesos(l.credito)}</td>
+        </tr>`).join('');
+      return `<div class="asiento">
+        <div class="encabezado">
+          <span class="consecutivo">#${a.consecutivo}</span>
+          <span class="cod tenue">${fecha(a.fecha)}</span>
+          <span class="glosa">${esc(a.descripcion)}</span>
+          <span class="chip neutro" style="margin-left:auto">${esc(a.origen.replace(/_/g, ' ').toLowerCase())}</span>
+        </div>
+        <table>
+          <thead><tr><th>Cuenta</th><th></th><th class="num">Debe</th><th class="num">Haber</th></tr></thead>
+          <tbody>${filas}</tbody>
+        </table>
+      </div>`;
+    }).join('');
+
+    seccion('libro', 'Libro de asientos', 'últimos 10 de ' + DATOS.conteos.asientos,
+      'La fuente de verdad del sistema. Nada se edita y nada se borra: corregir es emitir una reversión. La base de datos lo hace cumplir con triggers, no la aplicación — una regla que sólo vive en el código se rompe el día que alguien abre una consola.',
+      `<div class="libro">${bloques}</div>`);
+  }
+
+  // ========================================================= 14. CATÁLOGO
+  {
+    const filas = DATOS.catalogo.map((p) => {
+      const pres = p.presentaciones.map((x) => {
+        const u = Number(x.unidadesBase) / 1000;
+        const etiqueta = p.unidad_base === 'ML' ? fmtNum.format(u) + ' ml' : fmtNum.format(u) + ' u';
+        const rol = x.esVenta ? ' · venta' : x.esCompra ? ' · compra' : '';
+        return `<span class="chip neutro">${esc(x.nombre)} = ${etiqueta}${rol}</span>`;
+      }).join(' ');
+      return `<tr>
+        <td class="cod">${esc(p.sku)}</td>
+        <td>${esc(p.nombre)}<div class="tenue" style="font-size:.78rem">${esc(p.marca ?? '')}</div></td>
+        <td class="tenue">${esc(p.categoria)}</td>
+        <td class="cod">${p.grado === null ? '—' : fmtNum.format(Number(p.grado) / 100) + '°'}</td>
+        <td class="cod">${p.contenido_cc === null ? '—' : p.contenido_cc + ' cc'}</td>
+        <td style="display:flex;gap:5px;flex-wrap:wrap">${pres}</td>
+      </tr>`;
+    }).join('');
+
+    seccion('catalogo', 'Catálogo y presentaciones', DATOS.conteos.productos + ' productos, ' + DATOS.conteos.presentaciones + ' presentaciones',
+      'Un producto, una unidad base, varias presentaciones. Así se evita el problema clásico de tener «Ron caja» y «Ron botella» como productos separados con existencias que se desincronizan. El grado alcoholimétrico y el contenido son obligatorios para el impuesto al consumo: sin ellos no es calculable.',
+      `<div class="marco-tabla alto">
+        <table>
+          <thead><tr><th>SKU</th><th>Producto</th><th>Categoría</th><th>Grado</th><th>Contenido</th><th>Presentaciones</th></tr></thead>
+          <tbody>${filas}</tbody>
+        </table>
+      </div>`);
+  }
+
+  // ========================================================= 15. IMPUESTOS
+  {
+    const filas = DATOS.tarifas.map((t) => `
+      <tr class="atencion">
+        <td class="franja cod">${esc(t.tipo)}</td>
+        <td>${esc(t.categoria ?? 'General')}</td>
+        <td class="num">${t.numerador}/${t.denominador}</td>
+        <td class="num">${fmtNum.format((Number(t.numerador) / Number(t.denominador)) * 100)}%</td>
+        <td class="cod">${esc(t.vigencia_desde)}</td>
+        <td class="tenue" style="font-size:.8rem">${esc(t.fuente)}</td>
+      </tr>`).join('');
+
+    seccion('impuestos', 'Motor de impuestos', DATOS.tarifas.length + ' tarifas vigentes',
+      'Las tarifas son datos con vigencia y fuente normativa, no constantes en el código. En Colombia cambian cada año, y un informe de 2024 tiene que seguir calculándose con las reglas de 2024. La tarifa se guarda como fracción entera (19/100), nunca como decimal: un 0,19 en coma flotante reintroduce el error que el resto del sistema evita.',
+      `<div class="aviso" style="margin-bottom:14px">
+        <div><strong>Todas estas tarifas son provisionales.</strong>
+        Se cargaron para poder ver el sistema funcionando. Antes de operar hay siete
+        preguntas que debe responder el contador: régimen de IVA, si Adorema es
+        responsable del impuesto al consumo o compra a distribuidor que ya lo liquidó,
+        tarifas por categoría, departamento y municipio, tarifa de ICA, retenciones,
+        y el umbral en UVT para el tiquete POS.</div>
+      </div>
+      <div class="marco-tabla">
+        <table>
+          <thead><tr><th>Tipo</th><th>Categoría</th><th class="num">Fracción</th><th class="num">Equivale a</th><th>Vigente desde</th><th>Fuente</th></tr></thead>
+          <tbody>${filas}</tbody>
+        </table>
+      </div>`);
+  }
+</script>

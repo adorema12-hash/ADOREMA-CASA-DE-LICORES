@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@adorema/shared": ["packages/shared/src/index.ts"],
+      "@adorema/domain": ["packages/domain/src/index.ts"],
+      "@adorema/domain/*": ["packages/domain/src/*"],
+      "@adorema/db": ["packages/db/src/index.ts"],
+      "@adorema/db/schema": ["packages/db/src/schema/index.ts"],
+      "@adorema/aplicacion": ["packages/aplicacion/src/index.ts"]
+    }
+  },
+  "include": ["packages/**/*.ts", "apps/**/*.ts", "*.ts"]
+}
